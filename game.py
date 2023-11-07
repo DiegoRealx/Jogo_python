@@ -1,79 +1,68 @@
 import random
 
-# Gera um número secreto aleatório
 numero_secreto = random.randint(1, 100)
-
-
 tentativas = 0
-
-# Lista para armazenar os resultados do jogo
 ranking = []
-
 
 nome = input('Olá! Qual é o seu nome? ')
 print(f'Olá {nome}! Bem-vindo ao jogo de adivinhação!')
 print('Tente adivinhar o número secreto entre 1 e 100!')
 
-# Loop do jogo que continua até o jogador adivinhar o número
 while True:
-    # Pede para o jogador fazer uma tentativa e soma ela
-    tentativa = int(input('Digite um número: '))
+    try:
+        tentativa = int(input('Digite um numero: '))
+    except ValueError:
+        print('Digite um numero valido')
+            
     tentativas += 1
 
-    # Fornecendo feedback ao jogador com base na tentativa em relação ao número secreto
     if tentativa < numero_secreto:
-        print(f'O número é maior do que {tentativa}')
+        print('O número é maior do que o que você tentou.')
     elif tentativa > numero_secreto:
-        print(f'O número é menor do que {tentativa}')
+        print('O número é menor do que o que você tentou.')
     else:
         print(f'Parabéns, {nome}! Você adivinhou o número corretamente: {numero_secreto} em {tentativas} tentativas.')
 
-        # Adiciona o resultado atual à lista de ranking
         ranking.append((nome, tentativas))
-
-        # Escreve no arquivo de ranking os resultados do jogador atual
         with open('ranking.txt', 'a') as file:
             file.write(f'{nome}: {tentativas} tentativas\n')
 
-        # mostra o ranking atual de forma ordenada 
         print('== RANKING ==')
         ranking.sort(key=lambda x: x[1])
-        for i, (jogador, tentativas) in enumerate(ranking):
-            print(f'{i + 1}. {jogador}: {tentativas} tentativas')
+        for i, (jogador, tentativas) in enumerate(ranking, start=1):
+            print(f'{i}. {jogador}: {tentativas} tentativas')
+        break
 
-        break 
-# Calculando a média de todas as pontuações dos jogadores
 try:
     with open('ranking.txt', 'r') as file:
-        ranking = file.readlines() # Lê as linhas do arquivo e armazena na lista 'ranking'
+        ranking = file.readlines()
         
         if len(ranking) == 0:
             print('O ranking está vazio.')
         else:
-            print('== RANKING ==')
-            
-            # variáveis para calcular a média
             total_tentativas = 0
             total_jogadores = 0
-            
-            # Itera sobre cada linha no ranking
-            for linha in ranking: 
-                jogador, tentativas_str = linha.split(":") # Divide a linha em jogador e tentativas
-                tentativas = int(tentativas_str.split()[0]) # Converte as tentativas para um número inteiro
-                total_tentativas += tentativas # Soma as tentativas ao total de tentativas
-                #  o contador de jogadores
+
+            for linha in ranking:
+                jogador, tentativas_str = linha.split(":")
+                tentativas = int(tentativas_str.split()[0])
+                total_tentativas += tentativas
                 total_jogadores += 1
-                # Exibe a linha do ranking
                 print(linha.strip())
 
-            # Calcula a média das tentativas
             media = total_tentativas / total_jogadores
-
-            # Mostra a média formatada com duas casas decimais
             print(f'A média de tentativas foi: {media:.2f}')
+            ranking.sort(key=lambda x: int(x.split(":")[1].split()[0]))
+
+            print('== RANKING FINAL ==')
+            for i, linha in enumerate(ranking, start=1):
+                print(f'{i}. {linha.strip()}')
 
 except FileNotFoundError:
     print('Arquivo não encontrado.')
+
+
+
 
 
 
